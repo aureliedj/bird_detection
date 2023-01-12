@@ -18,47 +18,14 @@
     {
       "cell_type": "code",
       "source": [
-        "from torchvision.models.detection import fasterrcnn_resnet50_fpn_v2, FasterRCNN_ResNet50_FPN_V2_Weights\r\n",
-        "from torchvision.models.detection.faster_rcnn import FastRCNNPredictor\r\n",
-        "from torch  import nn\r\n",
-        "\r\n",
-        "def get_model_object_detection(num_classes):\r\n",
-        "\r\n",
-        "    model = fasterrcnn_resnet50_fpn_v2(weights= FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT)\r\n",
-        "\r\n",
-        "    ## change first convolution to take 3*3 channels as inputs --> 9\r\n",
-        "    # model.backbone.body.conv1 = nn.Conv2d(9, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)\r\n",
-        "    \r\n",
-        "    # get number of input features for the classifier\r\n",
-        "    in_features = model.roi_heads.box_predictor.cls_score.in_features\r\n",
-        "    # replace the pre-trained head with a new one\r\n",
-        "    model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)\r\n",
-        "\r\n",
-        "    \"\"\"## check trainabe parameters\r\n",
-        "    params = [p for p in model.parameters() if p.requires_grad]\"\"\"\r\n",
-        "\r\n",
-        "    return model"
-      ],
-      "outputs": [],
-      "execution_count": 144,
-      "metadata": {
-        "gather": {
-          "logged": 1673540676021
-        }
-      }
-    },
-    {
-      "cell_type": "code",
-      "source": [
         "import os\r\n",
         "import torch\r\n",
-        "import torch.utils.data\r\n",
         "import torchvision\r\n",
-        "from PIL import Image\r\n",
-        "from pycocotools.coco import COCO"
+        "\r\n",
+        "from utils import get_model_object_detection, myOwnDataset"
       ],
       "outputs": [],
-      "execution_count": 100,
+      "execution_count": 1,
       "metadata": {
         "jupyter": {
           "source_hidden": false,
@@ -70,90 +37,7 @@
           }
         },
         "gather": {
-          "logged": 1673539418974
-        }
-      }
-    },
-    {
-      "cell_type": "code",
-      "source": [
-        "class myOwnDataset(torch.utils.data.Dataset):\r\n",
-        "    def __init__(self, root, annotation, transforms=None):\r\n",
-        "        self.root = root\r\n",
-        "        self.transforms = transforms\r\n",
-        "        self.coco = COCO(annotation)\r\n",
-        "        self.ids = list(sorted(self.coco.imgs.keys()))\r\n",
-        "\r\n",
-        "    def __getitem__(self, index):\r\n",
-        "        # Own coco file\r\n",
-        "        coco = self.coco\r\n",
-        "        # Image ID\r\n",
-        "        img_id = self.ids[index]\r\n",
-        "        # List: get annotation id from coco\r\n",
-        "        ann_ids = coco.getAnnIds(imgIds=img_id)\r\n",
-        "        # Dictionary: target coco_annotation file for an image\r\n",
-        "        coco_annotation = coco.loadAnns(ann_ids)\r\n",
-        "        # path for input image\r\n",
-        "        path = coco.loadImgs(img_id)[0]['file_name']\r\n",
-        "        # open the input image\r\n",
-        "        img = Image.open(os.path.join(self.root, path))\r\n",
-        "\r\n",
-        "        # number of objects in the image\r\n",
-        "        num_objs = len(coco_annotation)\r\n",
-        "\r\n",
-        "        # Bounding boxes for objects\r\n",
-        "        # In coco format, bbox = [xmin, ymin, width, height]\r\n",
-        "        # In pytorch, the input should be [xmin, ymin, xmax, ymax]\r\n",
-        "        boxes = []\r\n",
-        "        for i in range(num_objs):\r\n",
-        "            xmin = coco_annotation[i]['bbox'][0]\r\n",
-        "            ymin = coco_annotation[i]['bbox'][1]\r\n",
-        "            xmax = xmin + coco_annotation[i]['bbox'][2]\r\n",
-        "            ymax = ymin + coco_annotation[i]['bbox'][3]\r\n",
-        "            boxes.append([xmin, ymin, xmax, ymax])\r\n",
-        "        boxes = torch.as_tensor(boxes, dtype=torch.float32)\r\n",
-        "        # Labels (In my case, I only one class: target class or background)\r\n",
-        "        labels = torch.ones((num_objs,), dtype=torch.int64)\r\n",
-        "        # Tensorise img_id\r\n",
-        "        img_id = torch.tensor([img_id])\r\n",
-        "        # Size of bbox (Rectangular)\r\n",
-        "        areas = []\r\n",
-        "        for i in range(num_objs):\r\n",
-        "            areas.append(coco_annotation[i]['area'])\r\n",
-        "        areas = torch.as_tensor(areas, dtype=torch.float32)\r\n",
-        "        # Iscrowd\r\n",
-        "        iscrowd = torch.zeros((num_objs,), dtype=torch.int64)\r\n",
-        "\r\n",
-        "        # Annotation is in dictionary format\r\n",
-        "        my_annotation = {}\r\n",
-        "        my_annotation[\"boxes\"] = boxes\r\n",
-        "        my_annotation[\"labels\"] = labels\r\n",
-        "        my_annotation[\"image_id\"] = img_id\r\n",
-        "        my_annotation[\"area\"] = areas\r\n",
-        "        my_annotation[\"iscrowd\"] = iscrowd\r\n",
-        "\r\n",
-        "        if self.transforms is not None:\r\n",
-        "            img = self.transforms(img)\r\n",
-        "\r\n",
-        "        return img, my_annotation\r\n",
-        "\r\n",
-        "    def __len__(self):\r\n",
-        "        return len(self.ids)"
-      ],
-      "outputs": [],
-      "execution_count": 115,
-      "metadata": {
-        "jupyter": {
-          "source_hidden": false,
-          "outputs_hidden": false
-        },
-        "nteract": {
-          "transient": {
-            "deleting": false
-          }
-        },
-        "gather": {
-          "logged": 1673539901434
+          "logged": 1673541235992
         }
       }
     },
@@ -161,28 +45,8 @@
       "cell_type": "code",
       "source": [
         "root = os.getcwd() + '/../data/birds/annotations/all'\r\n",
-        "pathin = root + '/../coco_annotations.json'"
-      ],
-      "outputs": [],
-      "execution_count": 116,
-      "metadata": {
-        "jupyter": {
-          "source_hidden": false,
-          "outputs_hidden": false
-        },
-        "nteract": {
-          "transient": {
-            "deleting": false
-          }
-        },
-        "gather": {
-          "logged": 1673539902512
-        }
-      }
-    },
-    {
-      "cell_type": "code",
-      "source": [
+        "pathin = root + '/../coco_annotations.json'\r\n",
+        "\r\n",
         "def get_transform():\r\n",
         "    custom_transforms = []\r\n",
         "    custom_transforms.append(torchvision.transforms.ToTensor())\r\n",
@@ -204,10 +68,10 @@
         {
           "output_type": "stream",
           "name": "stdout",
-          "text": "loading annotations into memory...\nDone (t=0.15s)\ncreating index...\nindex created!\n"
+          "text": "loading annotations into memory...\nDone (t=0.27s)\ncreating index...\nindex created!\n"
         }
       ],
-      "execution_count": 138,
+      "execution_count": 2,
       "metadata": {
         "jupyter": {
           "source_hidden": false,
@@ -219,7 +83,7 @@
           }
         },
         "gather": {
-          "logged": 1673540253622
+          "logged": 1673541236861
         }
       }
     },
@@ -259,14 +123,8 @@
         "\r\n",
         "        print(f'Iteration: {i}/{len_dataloader}, Loss: {losses}')"
       ],
-      "outputs": [
-        {
-          "output_type": "stream",
-          "name": "stdout",
-          "text": "Iteration: 1/1093, Loss: 2.987734317779541\nIteration: 2/1093, Loss: 1.4615288972854614\nIteration: 3/1093, Loss: 1.0547373294830322\nIteration: 4/1093, Loss: 1.0349512100219727\nIteration: 5/1093, Loss: 0.4889490306377411\nIteration: 6/1093, Loss: 0.40908658504486084\nIteration: 7/1093, Loss: 0.4058649241924286\nIteration: 8/1093, Loss: 0.34528648853302\nIteration: 9/1093, Loss: 0.2997545003890991\n"
-        }
-      ],
-      "execution_count": 145,
+      "outputs": [],
+      "execution_count": null,
       "metadata": {
         "jupyter": {
           "source_hidden": false,
