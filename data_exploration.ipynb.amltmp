@@ -12,7 +12,7 @@
       "execution_count": 1,
       "metadata": {
         "gather": {
-          "logged": 1673530777970
+          "logged": 1673593418877
         }
       }
     },
@@ -38,7 +38,7 @@
           }
         },
         "gather": {
-          "logged": 1673530780406
+          "logged": 1673593419393
         }
       }
     },
@@ -66,7 +66,7 @@
           }
         },
         "gather": {
-          "logged": 1673530781204
+          "logged": 1673593419930
         }
       }
     },
@@ -81,10 +81,42 @@
       "outputs": [
         {
           "output_type": "execute_result",
-          "execution_count": 5,
+          "execution_count": 4,
           "data": {
             "text/plain": "    Nb birds  Nb images\n0          1        949\n1          2        446\n2          3        276\n3          4        151\n4          5         98\n5          6         72\n6          7         51\n7          8         34\n8          9         30\n9         10         18\n10        11         18\n11        12         13\n12        13          3\n13        14          8\n14        15          2\n15        16          3\n16        17          2\n17        18          3\n18        19          1\n19        21          1\n20        22          1\n21        29          1\n22        38          1\n23        39          1\n24        41          1\n25        42          1\n26        43          1",
             "text/html": "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>Nb birds</th>\n      <th>Nb images</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>1</td>\n      <td>949</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>2</td>\n      <td>446</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>3</td>\n      <td>276</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>4</td>\n      <td>151</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>5</td>\n      <td>98</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>6</td>\n      <td>72</td>\n    </tr>\n    <tr>\n      <th>6</th>\n      <td>7</td>\n      <td>51</td>\n    </tr>\n    <tr>\n      <th>7</th>\n      <td>8</td>\n      <td>34</td>\n    </tr>\n    <tr>\n      <th>8</th>\n      <td>9</td>\n      <td>30</td>\n    </tr>\n    <tr>\n      <th>9</th>\n      <td>10</td>\n      <td>18</td>\n    </tr>\n    <tr>\n      <th>10</th>\n      <td>11</td>\n      <td>18</td>\n    </tr>\n    <tr>\n      <th>11</th>\n      <td>12</td>\n      <td>13</td>\n    </tr>\n    <tr>\n      <th>12</th>\n      <td>13</td>\n      <td>3</td>\n    </tr>\n    <tr>\n      <th>13</th>\n      <td>14</td>\n      <td>8</td>\n    </tr>\n    <tr>\n      <th>14</th>\n      <td>15</td>\n      <td>2</td>\n    </tr>\n    <tr>\n      <th>15</th>\n      <td>16</td>\n      <td>3</td>\n    </tr>\n    <tr>\n      <th>16</th>\n      <td>17</td>\n      <td>2</td>\n    </tr>\n    <tr>\n      <th>17</th>\n      <td>18</td>\n      <td>3</td>\n    </tr>\n    <tr>\n      <th>18</th>\n      <td>19</td>\n      <td>1</td>\n    </tr>\n    <tr>\n      <th>19</th>\n      <td>21</td>\n      <td>1</td>\n    </tr>\n    <tr>\n      <th>20</th>\n      <td>22</td>\n      <td>1</td>\n    </tr>\n    <tr>\n      <th>21</th>\n      <td>29</td>\n      <td>1</td>\n    </tr>\n    <tr>\n      <th>22</th>\n      <td>38</td>\n      <td>1</td>\n    </tr>\n    <tr>\n      <th>23</th>\n      <td>39</td>\n      <td>1</td>\n    </tr>\n    <tr>\n      <th>24</th>\n      <td>41</td>\n      <td>1</td>\n    </tr>\n    <tr>\n      <th>25</th>\n      <td>42</td>\n      <td>1</td>\n    </tr>\n    <tr>\n      <th>26</th>\n      <td>43</td>\n      <td>1</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+          },
+          "metadata": {}
+        }
+      ],
+      "execution_count": 4,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1673593420458
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "cond = count_anno['anno_id'] > 20\r\n",
+        "count_anno['img_id'][cond]"
+      ],
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "execution_count": 5,
+          "data": {
+            "text/plain": "69      70\n430    433\n431    434\n432    435\n433    436\n434    437\n435    438\n436    439\nName: img_id, dtype: int64"
           },
           "metadata": {}
         }
@@ -101,30 +133,7 @@
           }
         },
         "gather": {
-          "logged": 1673530827509
-        }
-      }
-    },
-    {
-      "cell_type": "code",
-      "source": [
-        "cond = count_anno['anno_id'] > 20\r\n",
-        "count_anno['img_id'][cond]"
-      ],
-      "outputs": [],
-      "execution_count": null,
-      "metadata": {
-        "jupyter": {
-          "source_hidden": false,
-          "outputs_hidden": false
-        },
-        "nteract": {
-          "transient": {
-            "deleting": false
-          }
-        },
-        "gather": {
-          "logged": 1673529654989
+          "logged": 1673593421006
         }
       }
     },
