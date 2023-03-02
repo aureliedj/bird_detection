@@ -1,0 +1,15 @@
+cv2
+tqdm
+matplotlib.patches
+glob
+utils
+albumentations
+numpy
+pycocotools.coco
+datetime
+matplotlib.pyplot
+torchvision
+PIL
+pandas
+torch
+os
